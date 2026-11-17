@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Leilão ao vivo & Mata-Mata</title>
+<link rel="stylesheet" href="leilao.css">
+<script src="https://unpkg.com/peerjs@1.5.4/dist/peerjs.min.js"></script>
+<script src="script_jogadores.js"></script>
+<script src="leilao.js" defer></script>
+</head>
+<body>
+<header>
+  <a href="index.html">⚽ LEILÃO DE FUTEBOL</a>
+  <span id="roomLabel">Sala</span>
+</header>
+
+<main>
+  <!-- PARTE SUPERIOR: LEILÃO -->
+  <section class="top">
+    <div>
+      <small>LEILÃO AO VIVO</small>
+      <h1>Dispute os craques</h1>
+      <p id="conexao">Conectando...</p>
+    </div>
+    <div class="saldo">
+      <small>SEU ORÇAMENTO</small>
+      <strong id="saldo">€ 500.000.000</strong>
+    </div>
+  </section>
+
+  <section id="areaLeilao" class="layout">
+    <article class="jogador-atual">
+      <div class="etiqueta">JOGADOR EM LEILÃO</div>
+      <div class="avatar" id="avatar">⚽</div>
+      <h2 id="nomeJogador">Aguardando início do leilão...</h2>
+      <p id="dadosJogador">O anfitrião iniciará a disputa.</p>
+
+      <div class="lance">
+        <small>MAIOR LANCE</small>
+        <strong id="maiorLance">€ 0</strong>
+        <span id="maiorLicitante">Nenhum lance ainda (Começa em € 0)</span>
+      </div>
+
+      <div class="timer" id="timer">--</div>
+
+      <div class="acoes-personalizadas">
+        <p class="instrucao-lance">Digite seu lance ou adicione valores:</p>
+        <div class="botoes-rapidos">
+          <button class="btn-rapido" onclick="adicionarLance(1000000)">+ € 1M</button>
+          <button class="btn-rapido" onclick="adicionarLance(5000000)">+ € 5M</button>
+          <button class="btn-rapido" onclick="adicionarLance(10000000)">+ € 10M</button>
+          <button class="btn-rapido" onclick="adicionarLance(25000000)">+ € 25M</button>
+        </div>
+        <div class="grupo-input-lance">
+          <input type="number" id="valorLanceInput" min="1" step="1000000" placeholder="Ex: 15000000">
+          <button id="darLanceCustom" disabled>Dar Lance</button>
+        </div>
+      </div>
+
+      <div class="acoes" style="margin-top: 15px;">
+        <button id="passar" class="secundario" disabled>Passar</button>
+      </div>
+      <p id="mensagem" class="mensagem"></p>
+      <div id="areaBotaoIniciar"></div>
+    </article>
+
+    <aside>
+      <h2>Participantes (Leilão Humano)</h2>
+      <ul id="participantes"></ul>
+
+      <div id="areaControleAnfitriao" class="escondido" style="margin-top:20px; border-top:1px solid #183b5d; padding-top:15px;">
+        <h2 style="font-size:16px; margin-bottom:10px;">Painel do Anfitrião</h2>
+        <button id="botaoPausaGlobal" style="width:100%; background:linear-gradient(90deg,#ff8800,#ffaa00); color:#050d1a; font-weight:bold; padding:12px; border-radius:8px;">⏸️ Pausar Leilão (Organizar Time)</button>
+      </div>
+
+      <h2 class="subtitulo">Histórico recente</h2>
+      <ul id="historico"></ul>
+    </aside>
+  </section>
+
+  <!-- PARTE INFERIOR: ESCALAÇÃO -->
+  <section id="secaoEscalacao" class="escalacao-wrapper escondido">
+    <div class="topo-escalacao">
+      <div>
+        <small>SEU TIME TITULAR</small>
+        <h2>⚽ Minha Escalação (<span id="totalEscalados">0/11</span>) • Média Overall: <span id="mediaOverallTopo" style="color:#5ee0ae;">0.0</span></h2>
+        <p>Monitore overall e perna boa. Quando o anfitrião pausar, todos param para organizar a tática.</p>
+      </div>
+      <div class="controles-formacao">
+        <label for="formacao">Formação:</label>
+        <select id="formacao">
+          <option value="4-3-3">4-3-3</option>
+          <option value="4-2-3-1">4-2-3-1</option>
+          <option value="4-4-2">4-4-2</option>
+          <option value="3-5-2">3-5-2</option>
+          <option value="3-4-3">3-4-3</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="escalacao-grid">
+      <div class="campo">
+        <div class="linha-meio"></div>
+        <div class="circulo-meio"></div>
+        <div class="area area-superior"></div>
+        <div class="area area-inferior"></div>
+        <div id="campoJogadores"></div>
+      </div>
+
+      <div class="banco-box">
+        <h3>Jogadores contratados (Banco / Reserva)</h3>
+        <p class="nota-banco">Clique em um jogador para escalar na posição correta (veja perna boa e overall).</p>
+        <div id="listaBanco" class="lista-banco"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- PAUSA GLOBAL MODAL (APARECE PARA TODOS QUANDO O ANFITRIÃO PAUSA) -->
+  <div class="modal" id="modalPausaGlobal">
+    <div class="modal-conteudo" style="max-width: 620px; border:2px solid #ffaa00;">
+      <h2 style="color:#ffaa00;">⏸️ LEILÃO PAUSADO PELO ANFITRIÃO</h2>
+      <p class="pos-modal">O leilão foi pausado para todos! Aproveite para organizar sua escalação, verificar seu banco de reservas, testar formações e conferir a <strong>Média de Overall</strong> do seu time.</p>
+      
+      <div class="painel-pausa-info">
+        <div class="stat-box">
+          <small>Média de Overall do Time</small>
+          <strong id="mediaOverallModal">0.0</strong>
+        </div>
+        <div class="stat-box">
+          <small>Titulares Escalados</small>
+          <strong id="titularesModalCount">0 / 11</strong>
+        </div>
+      </div>
+
+      <p style="color:#b8cce0; font-size:13px; margin:15px 0; text-align:center;">Quando o anfitrião retomar o leilão, a disputa continuará automaticamente.</p>
+
+      <div id="areaBotaoRetomar"></div>
+    </div>
+  </div>
+
+  <!-- RESULTADOS DO MATA-MATA (OITAVAS ATÉ A FINAL) -->
+  <section id="resultados" class="resultados escondido">
+    <h2>🏆 TORNEIO MATA-MATA (OITAVAS À FINAL)</h2>
+    <p class="sub-resultados">Simulação baseada na <strong>Média de Overall</strong>, sintonia de <strong>Perna Boa</strong> e um toque de <strong>Fator Aleatório (Sorte)</strong>:</p>
+    <div id="bracketContainer" class="bracket-container"></div>
+    <button onclick="location.href='Sala.html'" style="margin-top:20px">Voltar às salas</button>
+  </section>
+</main>
+
+<!-- MODAIS -->
+<div class="modal" id="modalJogadores">
+  <div class="modal-conteudo">
+    <button class="fechar" id="fecharModal">×</button>
+    <h2>Escolher jogador para a vaga</h2>
+    <p id="posicaoSelecionada" class="pos-modal"></p>
+    <div id="opcoesJogadores"></div>
+  </div>
+</div>
+
+<div class="modal" id="modalPosicoes">
+  <div class="modal-conteudo">
+    <button class="fechar" id="fecharModalPos">×</button>
+    <h2>Onde escalar este jogador?</h2>
+    <p id="jogadorParaEscalar" class="pos-modal"></p>
+    <div id="opcoesPosicoes"></div>
+  </div>
+</div>
+
+</body>
+</html>

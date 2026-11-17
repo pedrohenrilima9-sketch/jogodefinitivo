@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Salas | Leilão de Futebol</title><link rel="stylesheet" href="sala.css">
+<script src="https://unpkg.com/peerjs@1.5.4/dist/peerjs.min.js"></script><script src="sala.js" defer></script>
+</head>
+<body>
+<header><a class="marca" href="index.html">⚽ LEILÃO DE FUTEBOL</a><a class="voltar" href="index.html">Início</a></header>
+<main>
+<section class="intro"><span class="tag">TORNEIO MATA-MATA</span><h1>Salas Online</h1><p>Crie uma sala ou entre com o código. Pausa global pelo anfitrião inclusa.</p></section>
+<section class="painel">
+<div class="bloco"><h2>➕ Criar sala</h2><label for="nomeCriador">Seu nome</label><input id="nomeCriador" maxlength="18" placeholder="Digite seu nome"><button id="criarSala">Criar sala</button><p class="nota">Você será o anfitrião e poderá pausar o leilão globalmente a qualquer momento.</p></div>
+<div class="separador"></div>
+<div class="bloco"><h2>🚪 Entrar em uma sala</h2><label for="nomeConvidado">Seu nome</label><input id="nomeConvidado" maxlength="18" placeholder="Digite seu nome"><label for="codigoSala">Código da sala</label><input id="codigoSala" maxlength="9" placeholder="Ex.: LF-123456" autocomplete="off"><button id="entrarSala" class="secundario">Entrar na sala</button></div>
+</section>
+<section id="status" class="status" aria-live="polite">Pronto para jogar.</section>
+<section id="salaAtiva" class="sala-ativa escondido"><div class="cabecalho-sala"><div><small>CÓDIGO DA SALA</small><h2 id="codigoExibido">------</h2></div><button id="copiarCodigo" class="secundario">Copiar código</button></div><h3>Jogadores conectados</h3><ul id="listaParticipantes"></ul><p id="avisoAnfitriao" class="nota"></p><button id="iniciarLeilao" class="iniciar escondido">Iniciar leilão e torneio</button><a id="abrirLeilao" class="iniciar escondido" href="leilao.html">Abrir leilão</a></section>
+</main>
+<footer>Conexão direta entre navegadores • Torneio de Oitavas a Final</footer>
+</body></html>
